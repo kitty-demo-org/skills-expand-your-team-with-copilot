@@ -51,6 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
     weekend: { days: ["Saturday", "Sunday"] }, // Weekend days
   };
 
+  function sanitizeText(value) {
+    return String(value || "")
+      .replace(/[\u0000-\u001F\u007F<>]/g, "")
+      .trim();
+  }
+
   // Initialize filters from active elements
   function initializeFilters() {
     // Initialize day filter
@@ -71,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const activityFromUrl = urlParams.get("activity");
 
     if (activityFromUrl) {
-      const safeActivity = activityFromUrl.replace(/[<>]/g, "").trim();
+      const safeActivity = sanitizeText(activityFromUrl);
       searchQuery = safeActivity;
       searchInput.value = safeActivity;
     }
@@ -513,7 +519,8 @@ document.addEventListener("DOMContentLoaded", () => {
     sharePageUrl.search = "";
     sharePageUrl.searchParams.set("activity", name);
     const shareUrl = sharePageUrl.toString();
-    const shareText = `Check out the ${name} activity at Mergington High School!`;
+    const safeActivityName = sanitizeText(name);
+    const shareText = `Check out the ${safeActivityName} activity at Mergington High School!`;
     const shareMessage = `${shareText} ${shareUrl}`;
     const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
       shareMessage
@@ -602,7 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
           href="${whatsappShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Share ${name} on WhatsApp"
+          aria-label="Share ${safeActivityName} on WhatsApp"
         >
           WhatsApp
         </a>
@@ -611,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
           href="${xShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Share ${name} on X"
+          aria-label="Share ${safeActivityName} on X"
         >
           X
         </a>
@@ -620,14 +627,14 @@ document.addEventListener("DOMContentLoaded", () => {
           href="${facebookShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Share ${name} on Facebook"
+          aria-label="Share ${safeActivityName} on Facebook"
         >
           Facebook
         </a>
         <button
           type="button"
           class="share-button copy-share-button"
-          aria-label="Copy share link for ${name}"
+          aria-label="Copy share link for ${safeActivityName}"
         >
           Copy Link
         </button>
@@ -657,15 +664,11 @@ document.addEventListener("DOMContentLoaded", () => {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(shareUrl);
           } else {
-            const fallbackInput = document.createElement("textarea");
-            fallbackInput.value = shareUrl;
-            fallbackInput.setAttribute("readonly", "");
-            fallbackInput.style.position = "absolute";
-            fallbackInput.style.left = "-9999px";
-            document.body.appendChild(fallbackInput);
-            fallbackInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(fallbackInput);
+            showMessage(
+              "Your browser does not support copying links automatically.",
+              "info"
+            );
+            return;
           }
           showMessage("Share link copied to clipboard.", "success");
         } catch (error) {
