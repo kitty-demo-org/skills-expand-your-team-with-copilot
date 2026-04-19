@@ -125,16 +125,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const isDarkMode = theme === "dark";
     document.body.classList.toggle("dark-mode", isDarkMode);
     themeToggleIcon.textContent = isDarkMode ? "☀️" : "🌙";
-    themeToggleText.textContent = isDarkMode ? "Light mode" : "Dark mode";
+    const nextThemeLabel = isDarkMode
+      ? "Switch to light mode"
+      : "Switch to dark mode";
+    themeToggleText.textContent = nextThemeLabel;
+    themeToggleButton.setAttribute("aria-label", nextThemeLabel);
   }
 
   // Initialize and persist theme selection
   function initializeTheme() {
     const savedTheme = localStorage.getItem("theme");
+    const validSavedTheme =
+      savedTheme === "light" || savedTheme === "dark" ? savedTheme : null;
     const prefersDarkMode =
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
-    applyTheme(savedTheme || (prefersDarkMode ? "dark" : "light"));
+    applyTheme(validSavedTheme || (prefersDarkMode ? "dark" : "light"));
 
     themeToggleButton.addEventListener("click", () => {
       const isDarkMode = document.body.classList.contains("dark-mode");
