@@ -71,8 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const activityFromUrl = urlParams.get("activity");
 
     if (activityFromUrl) {
-      searchQuery = activityFromUrl;
-      searchInput.value = activityFromUrl;
+      const safeActivity = activityFromUrl.replace(/[<>]/g, "").trim();
+      searchQuery = safeActivity;
+      searchInput.value = safeActivity;
     }
   }
 
@@ -513,10 +514,11 @@ document.addEventListener("DOMContentLoaded", () => {
     sharePageUrl.searchParams.set("activity", name);
     const shareUrl = sharePageUrl.toString();
     const shareText = `Check out the ${name} activity at Mergington High School!`;
+    const shareMessage = `${shareText} ${shareUrl}`;
     const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
-      `${shareText} ${shareUrl}`
+      shareMessage
     )}`;
-    const xShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+    const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
       shareText
     )}&url=${encodeURIComponent(shareUrl)}`;
     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
@@ -647,7 +649,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const copyShareButton = activityCard.querySelector(".copy-share-button");
     if (copyShareButton) {
       copyShareButton.addEventListener("click", async () => {
-        const shareMessage = `${shareText} ${shareUrl}`;
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(shareMessage);
