@@ -33,6 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
     community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
+  const appConfig = {
+    schoolName: "Mergington High School",
+  };
 
   // State for activities and filters
   let allActivities = {};
@@ -498,10 +501,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
-    const activityUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(
+    const activityUrl = `${window.location.origin}${window.location.pathname}#activity=${encodeURIComponent(
       name
     )}`;
-    const shareText = `Check out ${name} at Mergington High School! ${formattedSchedule}`;
+    const shareText = `Check out ${name} at ${appConfig.schoolName}!`;
     const encodedShareText = encodeURIComponent(shareText);
     const encodedShareUrl = encodeURIComponent(activityUrl);
 
