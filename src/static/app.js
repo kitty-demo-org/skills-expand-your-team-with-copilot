@@ -130,8 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize and persist theme selection
   function initializeTheme() {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    applyTheme(savedTheme);
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    applyTheme(savedTheme || (prefersDarkMode ? "dark" : "light"));
 
     themeToggleButton.addEventListener("click", () => {
       const isDarkMode = document.body.classList.contains("dark-mode");
