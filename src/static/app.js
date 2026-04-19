@@ -66,6 +66,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function initializeSearchFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activityFromUrl = urlParams.get("activity");
+
+    if (activityFromUrl) {
+      searchQuery = activityFromUrl;
+      searchInput.value = activityFromUrl;
+    }
+  }
+
   // Function to set day filter
   function setDayFilter(day) {
     currentDay = day;
@@ -498,7 +508,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
-    const shareUrl = `${window.location.origin}/static/index.html`;
+    const sharePageUrl = new URL(window.location.href);
+    sharePageUrl.search = "";
+    sharePageUrl.searchParams.set("activity", name);
+    const shareUrl = sharePageUrl.toString();
     const shareText = `Check out the ${name} activity at Mergington High School!`;
     const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
       `${shareText} ${shareUrl}`
@@ -934,5 +947,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize app
   checkAuthentication();
   initializeFilters();
+  initializeSearchFromUrl();
   fetchActivities();
 });
