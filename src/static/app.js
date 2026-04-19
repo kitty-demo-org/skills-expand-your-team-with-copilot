@@ -624,7 +624,11 @@ document.addEventListener("DOMContentLoaded", () => {
         >
           Facebook
         </a>
-        <button type="button" class="share-button copy-share-button">
+        <button
+          type="button"
+          class="share-button copy-share-button"
+          aria-label="Copy share link for ${name}"
+        >
           Copy Link
         </button>
       </div>
@@ -651,10 +655,10 @@ document.addEventListener("DOMContentLoaded", () => {
       copyShareButton.addEventListener("click", async () => {
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(shareMessage);
+            await navigator.clipboard.writeText(shareUrl);
           } else {
             const fallbackInput = document.createElement("textarea");
-            fallbackInput.value = shareMessage;
+            fallbackInput.value = shareUrl;
             fallbackInput.setAttribute("readonly", "");
             fallbackInput.style.position = "absolute";
             fallbackInput.style.left = "-9999px";
