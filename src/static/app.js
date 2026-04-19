@@ -515,9 +515,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
-    const sharePageUrl = new URL(window.location.href);
-    sharePageUrl.searchParams.set("activity", name);
-    const shareUrl = sharePageUrl.toString();
+    let shareUrl = `${window.location.origin}/static/index.html?activity=${encodeURIComponent(
+      name
+    )}`;
+    try {
+      const sharePageUrl = new URL(window.location.href);
+      sharePageUrl.searchParams.set("activity", name);
+      shareUrl = sharePageUrl.toString();
+    } catch (error) {
+      console.error("Error creating share URL from current location:", error);
+    }
     const safeActivityName = sanitizeShareText(name);
     const shareText = `Check out the ${safeActivityName} activity at Mergington High School!`;
     const shareMessage = `${shareText} ${shareUrl}`;
@@ -661,6 +668,13 @@ document.addEventListener("DOMContentLoaded", () => {
       copyShareButton.addEventListener("click", async () => {
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
+            if (!window.isSecureContext) {
+              showMessage(
+                "Copy link works only on secure pages (HTTPS). Please copy from the browser address bar.",
+                "info"
+              );
+              return;
+            }
             await navigator.clipboard.writeText(shareUrl);
           } else {
             showMessage(
