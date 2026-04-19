@@ -304,6 +304,27 @@ document.addEventListener("DOMContentLoaded", () => {
     return details.schedule;
   }
 
+  // Build social sharing links for an activity
+  function buildShareLinks(activityName, details) {
+    const formattedSchedule = formatSchedule(details);
+    const activityUrl = `${window.location.origin}${
+      window.location.pathname
+    }?activity=${encodeURIComponent(activityName)}`;
+    const shareText = `Check out ${activityName} at Mergington High School Activities (${formattedSchedule}).`;
+    const encodedUrl = encodeURIComponent(activityUrl);
+    const encodedText = encodeURIComponent(shareText);
+    const encodedSubject = encodeURIComponent(
+      `Activity recommendation: ${activityName}`
+    );
+    const encodedBody = encodeURIComponent(`${shareText}\n\n${activityUrl}`);
+
+    return {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      x: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+      email: `mailto:?subject=${encodedSubject}&body=${encodedBody}`,
+    };
+  }
+
   // Function to determine activity type (this would ideally come from backend)
   function getActivityType(activityName, description) {
     const name = activityName.toLowerCase();
@@ -498,6 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
+    const shareLinks = buildShareLinks(name, details);
 
     // Create activity tag
     const tagHtml = `
@@ -528,6 +550,19 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
       </p>
       ${capacityIndicator}
+      <div class="share-actions">
+        <a class="share-button share-facebook" href="${
+          shareLinks.facebook
+        }" target="_blank" rel="noopener noreferrer">
+          Share on Facebook
+        </a>
+        <a class="share-button share-x" href="${shareLinks.x}" target="_blank" rel="noopener noreferrer">
+          Share on X
+        </a>
+        <a class="share-button share-email" href="${shareLinks.email}">
+          Share by Email
+        </a>
+      </div>
       <div class="participants-list">
         <h5>Current Participants:</h5>
         <ul>
