@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     weekend: { days: ["Saturday", "Sunday"] }, // Weekend days
   };
 
-  function sanitizeText(value) {
+  function sanitizeShareText(value) {
     return String(value || "")
       .replace(/[\u0000-\u001F\u007F<>]/g, "")
       .trim();
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const activityFromUrl = urlParams.get("activity");
 
     if (activityFromUrl) {
-      const safeActivity = sanitizeText(activityFromUrl);
+      const safeActivity = sanitizeShareText(activityFromUrl);
       searchQuery = safeActivity;
       searchInput.value = safeActivity;
     }
@@ -516,10 +516,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
     const sharePageUrl = new URL(window.location.href);
-    sharePageUrl.search = "";
     sharePageUrl.searchParams.set("activity", name);
     const shareUrl = sharePageUrl.toString();
-    const safeActivityName = sanitizeText(name);
+    const safeActivityName = sanitizeShareText(name);
     const shareText = `Check out the ${safeActivityName} activity at Mergington High School!`;
     const shareMessage = `${shareText} ${shareUrl}`;
     const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
@@ -665,7 +664,7 @@ document.addEventListener("DOMContentLoaded", () => {
             await navigator.clipboard.writeText(shareUrl);
           } else {
             showMessage(
-              "Your browser does not support copying links automatically.",
+              "Your browser does not support copying links automatically. Please copy the link from your browser address bar.",
               "info"
             );
             return;
