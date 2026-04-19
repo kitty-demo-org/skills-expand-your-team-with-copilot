@@ -33,9 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
     community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
-  const appConfig = {
-    schoolName: "Mergington High School",
-  };
+  const schoolName =
+    document.querySelector("header h1")?.textContent?.trim() ||
+    "Mergington High School";
 
   // State for activities and filters
   let allActivities = {};
@@ -473,12 +473,47 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    focusSharedActivityCard();
+  }
+
+  function getSharedActivityFromHash() {
+    if (!window.location.hash.startsWith("#activity=")) {
+      return "";
+    }
+
+    try {
+      return decodeURIComponent(window.location.hash.replace("#activity=", ""));
+    } catch (error) {
+      console.error("Invalid activity hash value:", error);
+      return "";
+    }
+  }
+
+  function focusSharedActivityCard() {
+    const sharedActivityName = getSharedActivityFromHash();
+    if (!sharedActivityName) {
+      return;
+    }
+
+    const matchingCard = Array.from(
+      activitiesList.querySelectorAll(".activity-card")
+    ).find((card) => card.dataset.activityName === sharedActivityName);
+
+    if (matchingCard) {
+      matchingCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      matchingCard.classList.add("highlight-share");
+      setTimeout(() => {
+        matchingCard.classList.remove("highlight-share");
+      }, 2000);
+    }
   }
 
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.dataset.activityName = name;
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -504,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const activityUrl = `${window.location.origin}${window.location.pathname}#activity=${encodeURIComponent(
       name
     )}`;
-    const shareText = `Check out ${name} at ${appConfig.schoolName}!`;
+    const shareText = `Check out ${name} at ${schoolName}!`;
     const encodedShareText = encodeURIComponent(shareText);
     const encodedShareUrl = encodeURIComponent(activityUrl);
 
@@ -901,6 +936,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Initialize app
+  window.addEventListener("hashchange", focusSharedActivityCard);
   checkAuthentication();
   initializeFilters();
   fetchActivities();
