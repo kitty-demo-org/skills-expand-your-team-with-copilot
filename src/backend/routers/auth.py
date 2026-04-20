@@ -7,6 +7,7 @@ from typing import Dict, Any
 import hashlib
 
 from ..database import teachers_collection
+from ..validation import validate_utf8_text
 
 router = APIRouter(
     prefix="/auth",
@@ -20,6 +21,9 @@ def hash_password(password):
 @router.post("/login")
 def login(username: str, password: str) -> Dict[str, Any]:
     """Login a teacher account"""
+    validate_utf8_text(username, "username")
+    validate_utf8_text(password, "password")
+
     # Hash the provided password
     hashed_password = hash_password(password)
     
@@ -39,6 +43,8 @@ def login(username: str, password: str) -> Dict[str, Any]:
 @router.get("/check-session")
 def check_session(username: str) -> Dict[str, Any]:
     """Check if a session is valid by username"""
+    validate_utf8_text(username, "username")
+
     teacher = teachers_collection.find_one({"_id": username})
     
     if not teacher:
