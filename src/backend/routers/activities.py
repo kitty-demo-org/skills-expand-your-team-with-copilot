@@ -76,11 +76,12 @@ def signup_for_activity(activity_name: str, email: str, teacher_username: Option
     """Sign up a student for an activity - requires teacher authentication"""
     validate_utf8_text(activity_name, "activity_name")
     validate_utf8_text(email, "email")
+    if teacher_username:
+        validate_utf8_text(teacher_username, "teacher_username")
 
     # Check teacher authentication
     if not teacher_username:
         raise HTTPException(status_code=401, detail="Authentication required for this action")
-    validate_utf8_text(teacher_username, "teacher_username")
     
     teacher = teachers_collection.find_one({"_id": teacher_username})
     if not teacher:
@@ -112,11 +113,12 @@ def unregister_from_activity(activity_name: str, email: str, teacher_username: O
     """Remove a student from an activity - requires teacher authentication"""
     validate_utf8_text(activity_name, "activity_name")
     validate_utf8_text(email, "email")
+    if teacher_username:
+        validate_utf8_text(teacher_username, "teacher_username")
 
     # Check teacher authentication
     if not teacher_username:
         raise HTTPException(status_code=401, detail="Authentication required for this action")
-    validate_utf8_text(teacher_username, "teacher_username")
     
     teacher = teachers_collection.find_one({"_id": teacher_username})
     if not teacher:
