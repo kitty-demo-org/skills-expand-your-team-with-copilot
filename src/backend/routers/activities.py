@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from typing import Dict, Any, Optional, List
 
 from ..database import activities_collection, teachers_collection
+from ..validation import validate_utf8_text
 
 router = APIRouter(
     prefix="/activities",
@@ -29,6 +30,13 @@ def get_activities(
     """
     # Build the query based on provided filters
     query = {}
+
+    if day:
+        validate_utf8_text(day, "day")
+    if start_time:
+        validate_utf8_text(start_time, "start_time")
+    if end_time:
+        validate_utf8_text(end_time, "end_time")
     
     if day:
         query["schedule_details.days"] = {"$in": [day]}
@@ -66,9 +74,13 @@ def get_available_days() -> List[str]:
 @router.post("/{activity_name}/signup")
 def signup_for_activity(activity_name: str, email: str, teacher_username: Optional[str] = Query(None)):
     """Sign up a student for an activity - requires teacher authentication"""
+    validate_utf8_text(activity_name, "activity_name")
+    validate_utf8_text(email, "email")
+
     # Check teacher authentication
     if not teacher_username:
         raise HTTPException(status_code=401, detail="Authentication required for this action")
+    validate_utf8_text(teacher_username, "teacher_username")
     
     teacher = teachers_collection.find_one({"_id": teacher_username})
     if not teacher:
@@ -98,9 +110,13 @@ def signup_for_activity(activity_name: str, email: str, teacher_username: Option
 @router.post("/{activity_name}/unregister")
 def unregister_from_activity(activity_name: str, email: str, teacher_username: Optional[str] = Query(None)):
     """Remove a student from an activity - requires teacher authentication"""
+    validate_utf8_text(activity_name, "activity_name")
+    validate_utf8_text(email, "email")
+
     # Check teacher authentication
     if not teacher_username:
         raise HTTPException(status_code=401, detail="Authentication required for this action")
+    validate_utf8_text(teacher_username, "teacher_username")
     
     teacher = teachers_collection.find_one({"_id": teacher_username})
     if not teacher:
