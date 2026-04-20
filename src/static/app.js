@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
+  const schoolName =
+    document.querySelector("header h1")?.textContent?.trim() ||
+    "Mergington High School";
 
   // State for activities and filters
   let allActivities = {};
@@ -481,12 +484,47 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    focusSharedActivityCard();
+  }
+
+  function getSharedActivityFromHash() {
+    if (!window.location.hash.startsWith("#activity=")) {
+      return "";
+    }
+
+    try {
+      return decodeURIComponent(window.location.hash.replace("#activity=", ""));
+    } catch (error) {
+      console.error("Invalid activity hash value:", error);
+      return "";
+    }
+  }
+
+  function focusSharedActivityCard() {
+    const sharedActivityName = getSharedActivityFromHash();
+    if (!sharedActivityName) {
+      return;
+    }
+
+    const matchingCard = Array.from(
+      activitiesList.querySelectorAll(".activity-card")
+    ).find((card) => card.dataset.activityName === sharedActivityName);
+
+    if (matchingCard) {
+      matchingCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      matchingCard.classList.add("highlight-share");
+      setTimeout(() => {
+        matchingCard.classList.remove("highlight-share");
+      }, 2000);
+    }
   }
 
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.dataset.activityName = name;
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -509,6 +547,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
+    const activityUrl = `${window.location.origin}${window.location.pathname}#activity=${encodeURIComponent(
+      name
+    )}`;
+    const shareText = `Check out ${name} at ${schoolName}!`;
+    const encodedShareText = encodeURIComponent(shareText);
+    const encodedShareUrl = encodeURIComponent(activityUrl);
 
     // Create activity tag
     const tagHtml = `
@@ -583,6 +627,36 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+      </div>
+      <div class="share-actions">
+        <span class="share-label">Share:</span>
+        <a
+          class="share-button share-facebook"
+          href="https://www.facebook.com/sharer/sharer.php?u=${encodedShareUrl}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share ${name} on Facebook"
+        >
+          Facebook
+        </a>
+        <a
+          class="share-button share-x"
+          href="https://twitter.com/intent/tweet?text=${encodedShareText}&url=${encodedShareUrl}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share ${name} on X"
+        >
+          X
+        </a>
+        <a
+          class="share-button share-email"
+          href="mailto:?subject=${encodeURIComponent(
+            `Activity idea: ${name}`
+          )}&body=${encodedShareText}%0A%0A${encodedShareUrl}"
+          aria-label="Share ${name} by email"
+        >
+          Email
+        </a>
       </div>
     `;
 
@@ -890,6 +964,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Initialize app
+  window.addEventListener("hashchange", focusSharedActivityCard);
   checkAuthentication();
   initializeFilters();
   fetchActivities();
