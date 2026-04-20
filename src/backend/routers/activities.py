@@ -33,18 +33,14 @@ def get_activities(
 
     if day:
         validate_utf8_text(day, "day")
-    if start_time:
-        validate_utf8_text(start_time, "start_time")
-    if end_time:
-        validate_utf8_text(end_time, "end_time")
-    
-    if day:
         query["schedule_details.days"] = {"$in": [day]}
     
     if start_time:
+        validate_utf8_text(start_time, "start_time")
         query["schedule_details.start_time"] = {"$gte": start_time}
     
     if end_time:
+        validate_utf8_text(end_time, "end_time")
         query["schedule_details.end_time"] = {"$lte": end_time}
     
     # Query the database
